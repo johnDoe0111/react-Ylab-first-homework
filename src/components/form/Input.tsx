@@ -10,15 +10,21 @@ interface Props {
 }
 
 export const Input: FC<Props> = ({ control, name, type, placeholder }) => {
-  const { field } = useController({
+  const {
+    field,
+    fieldState: { error },
+  } = useController({
     name,
     control,
     defaultValue: "",
   });
 
   return (
-    <>
+    <div>
       <input type={type} {...field} placeholder={placeholder} />
-    </>
+      <div>
+        <p className="error-message">{error?.message}</p>
+      </div>
+    </div>
   );
 };

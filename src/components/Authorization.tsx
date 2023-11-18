@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { schema } from "../validation";
 import { Input } from "./form/Input";
@@ -9,29 +10,30 @@ export interface FormData {
 }
 
 const Authorization = () => {
-  const {
-    handleSubmit,
-    control,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>({
+  const { handleSubmit, control, reset } = useForm<FormData>({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      const fakeResponse = {
-        status: "success",
-        message: "Регистрация прошла успешно",
-        data: data,
-      };
+  const [loading, setLoading] = useState(false);
 
+  const onSubmit = (data: FormData) => {
+    setLoading(true);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const userData = {
+          id: 123,
+          username: "mockUser",
+          email: data.email,
+        };
+
+        resolve(userData);
+      }, 2000);
+    }).then((res) => {
+      alert(JSON.stringify(res));
+      setLoading(false);
       reset();
-      console.log(fakeResponse);
-    } catch (error) {
-      console.error("Ошибка при регистрации", error);
-    }
+    });
   };
 
   return (
@@ -48,19 +50,15 @@ const Authorization = () => {
             type="email"
             placeholder="Введите email"
           />
-          <div className="error-wrapper">
-            <p className="error-message">{errors.email?.message}</p>
-          </div>
           <Input
             control={control}
             name="password"
             type="password"
             placeholder="Введите пароль"
           />
-          <div className="error-wrapper">
-            <p className="error-message">{errors.password?.message}</p>
-          </div>
-          <button type="submit">Зарегистрироваться</button>
+          <button type="submit">
+            {loading ? "Загрузка" : "Зарегистрироваться"}
+          </button>
         </div>
       </form>
     </div>
